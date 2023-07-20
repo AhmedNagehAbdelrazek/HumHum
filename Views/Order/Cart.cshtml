@@ -1,0 +1,254 @@
+﻿@model HumHum.ViewModels.UserOrders
+
+@{
+    float TotalPrice = 0f;
+    string enablebutton = " ";
+}
+
+<style>
+    .modalcentered{
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        height: 70%;
+    }
+</style>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Food Name
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                OrderDate
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="tablebody">
+        @foreach (var item in Model.orders)
+        {
+            <tr id="@item.Id">
+                <td>
+                    @Html.DisplayFor(modelItem => item.fooditem.FoodItemName)
+                </td>
+                <td id="price">
+                    @Html.DisplayFor(modelItem => item.fooditem.Price)
+                </td>
+                <td id="quantity">
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderDate)
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-primary" onclick="additem(@item.Id);">Add</button>
+                    <button type="submit" class="btn btn-danger" onclick="removeitem(@item.Id);">Remove</button>
+                </td>
+            </tr>
+            TotalPrice += (item.fooditem.Price * item.Quantity);
+        }
+    </tbody>
+</table>
+
+<div id="payment">
+    <h2>Total Price :</h2>
+    <h3 class="text-info">@TotalPrice$</h3>
+    @if(Model.orders.Count() <= 0){
+        enablebutton = "pointer-events:none; background:#989898; border-color:#989898;";
+    }
+    <a class="btn btn-success" id="@Model.userid" style="@enablebutton" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="getallorders(event);">
+        Order
+    </a>
+    
+    
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" role="dialog" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modalcentered ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLabel">Receipt</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" >
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Food</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="receiptdata">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-secondary" asp-controller="Order" asp-action="CancelOrders" asp-route-id="@Model.userid">Cancel Order</a>
+                <a class="btn btn-primary px-5" asp-controller="Order" asp-action="ApproveOrders" asp-route-id="@Model.userid">Pay</a>
+                <a class="btn btn-danger px-5" data-bs-dismiss="modal">Close</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        });
+
+        var ToatalPrice = 0;
+        function additem(itemId) {
+            var element = '#tablebody #' + itemId;
+
+            //$('#tablebody tr').remove();
+            //ToatalPrice=0;
+            
+            var formData = new FormData();
+            formData.append("id", itemId);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddItem")',
+                contentType: false,
+                processData: false,
+                cache: false,
+                data: formData,
+                dataType: "json",
+
+                success: function (data) {
+                    //console.log(data);
+                    if(data != null){
+                        element+= " #quantity";
+                        $(element).html(data.quantity);
+
+                        $('#payment h3').html( parseFloat($('#payment h3').html()) + data.fooditem.price +"$");
+                    }
+
+                },
+                error: function (req, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+        function removeitem(itemId) {
+            var element = '#tablebody #' + itemId;
+
+            var elementquantity = element + " #quantity";
+            let quantity = parseInt($(elementquantity).html());
+
+            var price = $(element +" #price").html();
+            $('#payment h3').html(parseFloat($('#payment h3').html()) - parseInt(price) + "$");
+
+            if(quantity <= 1){
+                $(element).remove();
+                if ($('#tablebody tr').length == 0){
+                    $('#payment a').css({"pointer-events":"none", "background":"#989898", "border-color":"#989898"});
+                }
+            }
+
+            var formData = new FormData();
+            formData.append("id", itemId);
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("RemoveItem")',
+                contentType: false,
+                processData: false,
+                cache: false,
+                data: formData,
+                dataType: "json",
+                success: function (data) {
+                    if (data != null) {
+                        $(elementquantity).html(data.quantity);
+                    }
+                },
+                error: function (req, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+        function getallorders(event){
+            let userid = event.target.id;
+            var element = '#receiptdata';
+            $(element + " tr").remove();
+            let totalprice = 0;
+
+            var formData = new FormData();
+            formData.append("id", userid);
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ReturnAllRelatedOrders")',
+                contentType: false,
+                processData: false,
+                cache: false,
+                data: formData,
+                dataType: "json",
+                success: function (data) {
+                    $.each(data,function(key,value){
+                        console.log(value);
+                        $(element).append(
+                        "<tr>"+
+                        "<td>"+value.fooditem.foodItemName + "</td>"+
+                        "<td>"+value.quantity + "</td>"+
+                        "<td>" + value.fooditem.price + "</td>" +
+                        "</tr>"
+                        );
+                        totalprice += (value.fooditem.price * value.quantity);
+                    });
+                    $(element).append(
+                        "<tr>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td>TotalPrice</td>" +
+                        "</tr>" + "<tr>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td>" + totalprice + "</td>" +
+                        "</tr>"
+                    );
+                     
+                },
+                error: function (req, status, error) {
+                    console.log(error);
+                }
+            });
+
+        }
+        function cancelorders(event){
+            let userid = event.target.id;
+            var formData = new FormData();
+            formData.append("id", userid);
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancelOrders")',
+                contentType: false,
+                processData: false,
+                cache: false,
+                data: formData,
+                dataType: "json",
+                success: function (data) {
+                },
+                error: function (req, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+
+    </script>
+}
+
+

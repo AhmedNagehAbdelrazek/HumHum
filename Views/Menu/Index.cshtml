@@ -1,0 +1,47 @@
+﻿@model IEnumerable<HumHum.Models.FoodItem>
+
+@{
+    ViewData["Title"] = "Our Menu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="text/javascript">
+    const ViolateLogin = () => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: "@TempData["SignInError"]",
+            confirmButtonText:
+                '<i class="fa fa-thumbs-up"></i> Sign in Now ',
+            footer: 'if you Don\'t have an account  <a href="Identity/Account/Register"> Sign Up</a>'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "Identity/Account/login";
+            }
+        })
+    }
+
+</script>
+
+@if (TempData["SignInError"] != null)
+{
+    <script>
+        ViolateLogin();
+    </script>
+    TempData["SignInError"] = null;
+}
+@if(TempData["SearchValue"] !=null)
+{
+    <h2>The result for <span class="text-white fst-italic">@TempData["SearchValue"]</span></h2>
+    TempData["SearchValue"] = null;
+}else{
+    <h1 class="mb-3">@ViewData["Title"]</h1>
+}
+<div class="row">
+    @foreach (var item in Model)
+    {
+        @Html.Partial("FoodItem",item)
+    }
+</div>

@@ -1,0 +1,108 @@
+﻿@model HumHum.ViewModels.FoodItemCreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create</h1>
+
+<h4>Food Item</h4>
+<hr />
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FoodItemName" class="control-label"></label>
+                <input asp-for="FoodItemName" class="form-control" />
+                <span asp-validation-for="FoodItemName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <div class="col">
+                    <label asp-for="Image" class="control-label"></label>
+                    <input asp-for="Image" type="file" class="form-control" multiple accept="image/*" 
+                    data-bs-toggle="tooltip" data-bs-placement="right" title="the allowed extentions .jpg/.jpeg/.png/.gif" />
+                    <span class="text-danger" id="input-validation" style="display:none;">invalid chosen file</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Restaurant.RestaurantName" class="control-label"></label>
+                <select asp-for="RestaurantId" class ="form-control" asp-items="@(new SelectList(Model.restaurants, "RestaurantId", "RestaurantName"))" required>
+                    <option value="" disabled>Choose Restaurant</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary px-5" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4 offset-3 flex-row-reverse row">
+        <div class="col-6 text-center">
+            <label class="control-label"  id="imglabel" >Default Image</label>
+            <img src="/images/@Model.DefaultImage" id="foodimg" width="200px" height="200px">
+        </div>
+    </div>
+</div>
+
+<div>
+    <a class="btn-link" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        var img = document.querySelector('#foodimg');
+        var imglabel = document.querySelector('#imglabel');
+        var fileinput = document.querySelector('input[type="file"]');
+        var inputvalidation = document.getElementById('input-validation');
+
+        window.addEventListener('load', function () {
+
+            filesetup();
+
+            fileinput.addEventListener('change', function () {
+                    
+                console.log("boom agian");
+                if (this.files && this.files[0]) { // $('img')[0]
+
+                    var result = fileValidation(this.files[0].name); // validate for file extention
+                    if(result){
+                        inputvalidation.style.display = "none";
+                        img.src = URL.createObjectURL(this.files[0]); // set src to file url
+                        imglabel.innerHTML = "Food Photo"  //set file name in label
+                    }
+                }
+            });
+        });
+        function filesetup(){
+            const fileInput = document.querySelector('input[type="file"]');
+
+            const dataTransfer = new DataTransfer();
+
+            const file = new File(['Default Image'], 'Default Image', { type: 'text/plain' });
+
+            dataTransfer.items.add(file);
+
+            fileInput.files = dataTransfer.files;
+        }
+        function fileValidation(name) {
+
+            // Allowing file type
+            var allowedExtensions =
+                /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+
+            if (!allowedExtensions.exec(name)) {
+                inputvalidation.style.display = "block";
+                filesetup();
+                return false;
+            }
+            return true;
+        }
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

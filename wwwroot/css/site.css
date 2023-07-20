@@ -1,0 +1,99 @@
+:root {
+    --bg-orange: #FF9E00;
+}
+
+header {
+    background-color : white;
+}
+
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box !important;
+}
+h1, h2, h3, h4, h5, h6, p, td, th {
+    color: #ffa31a;
+}
+dt ,dd{
+    color:#fff;
+}
+tr,td{
+    text-align:center;
+    font-size:1.2rem;
+    font-weight:700;
+}
+label {
+    color : darkorange;
+}
+.btn-outline-dark , li{
+    background-color :white;
+}
+
+html {
+    font-size: 16px;
+    position: relative;
+}
+
+body {
+    margin-bottom: 60px;
+    font-family: 'Albert Sans', sans-serif;
+    background-color : black;
+}
+.food-icon{
+    width:80px;
+    height:80px;
+    border-radius:50px;
+    object-fit:cover;
+}
+.foodImg{
+    height:200px!important;
+    object-fit:cover!important;
+}
+.form-floating, 
+.form-control {
+    margin-bottom: 12px;
+}
+    .form-floating label {
+        font-weight: 800;
+        font-size: 1.2rem;
+    }
+
+    .form-floating input {
+        font-size: 1.1rem;
+    }
+
+    .btn-primary,
+    .btn-primary:hover,
+    .btn-primary:focus-within,
+    .btn-primary:active,
+    .nav-pills .nav-link.active,
+    .form-check-input:checked {
+        background: var(--bg-orange);
+        border-color: var(--bg-orange);
+        color: #222
+    }
+
+.nav-pills .nav-link {
+    color: #222;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-link,
+.btn-link:hover {
+    --bg-orange: #DB8800;
+}
+
+.btn-link,
+.btn-link:hover {
+    color: var(--bg-orange);
+    text-decoration: none;
+}
+.search-bar {
+    width: 60% !important;
+}
+@media (max-width:990px){
+    .search-bar{
+        width:75% !important;
+    }
+}

@@ -1,0 +1,47 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using HumHum.Areas.Identity.Data
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow">
+        <div class="container-lg">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img src="~/images/HumHum-Icon.bmp" height="30px"  /></a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path fill="none" d="M0 0h24v24H0z" /><path d="M3 4h18v2H3V4zm0 7h12v2H3v-2zm0 7h18v2H3v-2z" /></svg>
+            </button>
+            <div class="navbar-collapse collapse justify-content-between">
+                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Customer"))
+                {
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Menu" asp-action="Index">Menu</a>
+                        </li>
+                        @*<li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Cart">Orders</a>
+                        </li>*@
+                    </ul>
+                }
+                else if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                {
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Dashboard</a>
+                        </li>
+                    </ul>
+                }
+                else 
+                {
+                    <div></div>
+                }
+                <partial name="_SearchBar" />
+                <partial name="_LoginPartial" />
+            </div>
+        </div>
+    </nav>
+</header>

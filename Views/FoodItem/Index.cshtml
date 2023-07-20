@@ -1,0 +1,51 @@
+﻿@model IEnumerable<HumHum.Models.FoodItem>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a class="btn btn-primary px-5" asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th width="100px"></th>
+            <th>
+                @Html.DisplayNameFor(model => model.FoodItemName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Restaurant)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                    <img src="/images/@item.Image" class="food-icon" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FoodItemName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Restaurant.RestaurantName)
+            </td>
+            <td>
+                <a class="btn btn-light" asp-action="Edit" asp-route-id="@item.FoodItemId">Edit</a> |
+                <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.FoodItemId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
